@@ -56,8 +56,8 @@ class GildedRoseTest {
 	}
 	
 	@Test
-	void updateQuality_dontIncreaseQualityBy2_whenBackstagePasseSellInLessThan11AndGreaterThan5() {
-		Item[] items = new Item[] { new Item("Backstage passes to a TAFKAL80ETC concert", 10, 50) };
+	void updateQuality_onlyIncreaseTo50_whenBackstagePasseSellInBetween5and10Days() {
+		Item[] items = new Item[] { new Item("Backstage passes to a TAFKAL80ETC concert", 10, 49) };
 		GildedRose app = new GildedRose(items);
 		app.updateQuality();
 		assertEquals("Backstage passes to a TAFKAL80ETC concert, 9, 50", app.items[0].toString());
@@ -72,6 +72,17 @@ class GildedRoseTest {
 	}
 	
 	@Test
+	void updateQuality_onlyIncreaseTo50_whenBackstagePasseSellInLessThan6() {
+		String name = "Backstage passes to a TAFKAL80ETC concert";
+		int sellIn = 4;
+		int quality = 49;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Backstage passes to a TAFKAL80ETC concert, 3, 50", app.items[0].toString());
+	}
+	
+	@Test
 	void updateQuality_setQualityToO_whenBackstagePasseAreExpired() {
 		Item[] items = new Item[] { new Item("Backstage passes to a TAFKAL80ETC concert", 0, 5) };
 		GildedRose app = new GildedRose(items);
@@ -79,7 +90,70 @@ class GildedRoseTest {
 		assertEquals("Backstage passes to a TAFKAL80ETC concert, -1, 0", app.items[0].toString());
 	}
 	
+	@Test
+	void updateQuality_qualitySame_whenSulfuras() {
+		String name = "Sulfuras, Hand of Ragnaros";
+		int sellIn = -1;
+		int quality = 666;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Sulfuras, Hand of Ragnaros, -1, 666", app.items[0].toString());
+	}
 
-
+	@Test
+	void updateQuality_doubleDecreasedQuality_whenSellInLessThanZero() {
+		String name = "Bananas";
+		int sellIn = -1;
+		int quality = 49;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Bananas, -2, 47", app.items[0].toString());
+	}
+	
+	@Test
+	void updateQuality_AgedBrie_WhenSellInLessThan0_increaseQualityBy1() {
+		String name = "Aged Brie";
+		int sellIn = -1;
+		int quality = 48;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Aged Brie, -2, 50", app.items[0].toString());
+	}
+	
+	@Test
+	void updateQuality_AgedBrie_WhenSellInLessThan0_increaseQualityBy1ButNotMoreThan50() {
+		String name = "Aged Brie";
+		int sellIn = -1;
+		int quality = 50;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Aged Brie, -2, 50", app.items[0].toString());
+	}
+	
+	@Test
+	void updateQuality_AgedBrie_WhenSellInGreaterThan1_increaseQualityBy1ButNotMoreThan50() {
+		String name = "Aged Brie";
+		int sellIn = 25;
+		int quality = 50;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Aged Brie, 24, 50", app.items[0].toString());
+	}
+	
+	@Test
+	void updateQuality_AgedBrie_WhenSellInIs25_increaseQualityBy1ButNotMoreThan50() {
+		String name = "Aged Brie";
+		int sellIn = 25;
+		int quality = 48;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Aged Brie, 24, 49", app.items[0].toString());
+	}
 	
 }
