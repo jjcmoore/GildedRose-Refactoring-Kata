@@ -48,7 +48,7 @@ class GildedRoseTest {
 	}
 	
 	@Test
-	void updateQuality_increaseQualityBy2_whenBackstagePasseSellInLessThan11AndGreaterThan5() {
+	void updateQuality_increaseQualityBy2_whenBackstagePasseSellInBetween5And11() {
 		Item[] items = new Item[] { new Item("Backstage passes to a TAFKAL80ETC concert", 10, 0) };
 		GildedRose app = new GildedRose(items);
 		app.updateQuality();
@@ -58,6 +58,14 @@ class GildedRoseTest {
 	@Test
 	void updateQuality_onlyIncreaseTo50_whenBackstagePasseSellInBetween5and10Days() {
 		Item[] items = new Item[] { new Item("Backstage passes to a TAFKAL80ETC concert", 10, 49) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Backstage passes to a TAFKAL80ETC concert, 9, 50", app.items[0].toString());
+	}
+	
+	@Test
+	void updateQuality_doNotIncreasePast50_whenBackstagePasseSellInBetween5and10Days() {
+		Item[] items = new Item[] { new Item("Backstage passes to a TAFKAL80ETC concert", 10, 50) };
 		GildedRose app = new GildedRose(items);
 		app.updateQuality();
 		assertEquals("Backstage passes to a TAFKAL80ETC concert, 9, 50", app.items[0].toString());
@@ -154,6 +162,28 @@ class GildedRoseTest {
 		GildedRose app = new GildedRose(items);
 		app.updateQuality();
 		assertEquals("Aged Brie, 24, 49", app.items[0].toString());
+	}
+	
+	@Test
+	void updateQuality_conjuredItem_decreaseQualityDoubly() {
+		String name = "Conjured Mana Cake";
+		int sellIn = 4;
+		int quality = 8;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Conjured Mana Cake, 3, 6", app.items[0].toString());
+	}
+	
+	@Test
+	void updateQuality_conjuredItem_decreaseQualityDoublyEpired() {
+		String name = "Conjured Mana Cake";
+		int sellIn = -5;
+		int quality = 8;
+		Item[] items = new Item[] { new Item(name, sellIn, quality) };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("Conjured Mana Cake, -6, 4", app.items[0].toString());
 	}
 	
 }

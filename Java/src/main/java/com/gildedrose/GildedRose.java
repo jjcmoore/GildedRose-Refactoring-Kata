@@ -8,55 +8,95 @@ class GildedRose {
 	}
 
 	public void updateQuality() {
-		for (int i = 0; i < items.length; i++) {
-			if (!items[i].name.equals("Aged Brie")
-					&& !items[i].name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-				if (items[i].quality > 0) {
-					if (!items[i].name.equals("Sulfuras, Hand of Ragnaros")) {
-						items[i].quality = items[i].quality - 1;
-					}
-				}
-			} else {
-				if (items[i].quality < 50) {
-					items[i].quality = items[i].quality + 1;
+		for (int item = 0; item < items.length; item++) {
 
-					if (items[i].name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-						if (items[i].sellIn < 11) {
-							if (items[i].quality < 50) {
-								items[i].quality = items[i].quality + 1;
-							}
-						}
+			switch (getName(item)) {
 
-						if (items[i].sellIn < 6) {
-							if (items[i].quality < 50) {
-								items[i].quality = items[i].quality + 1;
-							}
-						}
-					}
-				}
-			}
+			case "Sulfuras, Hand of Ragnaros":
+				break;
 
-			if (!items[i].name.equals("Sulfuras, Hand of Ragnaros")) {
-				items[i].sellIn = items[i].sellIn - 1;
-			}
+			case "Aged Brie":
+				updateAgedBrie(item);
+				break;
 
-			if (items[i].sellIn < 0) {
-				if (!items[i].name.equals("Aged Brie")) {
-					if (!items[i].name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-						if (items[i].quality > 0) {
-							if (!items[i].name.equals("Sulfuras, Hand of Ragnaros")) {
-								items[i].quality = items[i].quality - 1;
-							}
-						}
-					} else {
-						items[i].quality = items[i].quality - items[i].quality;
-					}
-				} else {
-					if (items[i].quality < 50) {
-						items[i].quality = items[i].quality + 1;
-					}
-				}
+			case "Backstage passes to a TAFKAL80ETC concert":
+				updateTAFKAL80ETC(item);
+				break;
+			
+			case "Conjured":
+				updateConjured(item);
+				break;
+
+			default:
+				updateAllOther(item);
 			}
 		}
 	}
+
+	private String getName(int item) {
+		return items[item].name.contains("Conjured") ? "Conjured" : items[item].name;
+	}
+
+	private void updateConjured(int item) {
+		decrementQuality(item);
+		decrementQuality(item);
+		age(item);
+		if (expired(item)) {
+			decrementQuality(item);
+			decrementQuality(item);
+		}
+		
+		
+	}
+
+	private void updateAllOther(int item) {
+		decrementQuality(item);
+		age(item);
+		if (expired(item)) {
+			decrementQuality(item);
+		}
+	}
+
+	private void updateTAFKAL80ETC(int item) {
+		incrementQuality(item);
+		if (items[item].sellIn < 11) {
+			incrementQuality(item);
+		}
+		if (items[item].sellIn < 6) {
+			incrementQuality(item);
+		}
+		age(item);
+		if (expired(item)) {
+			items[item].quality = 0;
+		}
+	}
+
+	private void updateAgedBrie(int item) {
+		incrementQuality(item);
+		age(item);
+		if (expired(item)) {
+			incrementQuality(item);
+		}
+	}
+
+	private void incrementQuality(int itemIndex) {
+		if (items[itemIndex].quality < 50) {
+			items[itemIndex].quality++;
+		}
+	}
+	
+	private void decrementQuality(int item) {
+		if (items[item].quality > 0) {
+			items[item].quality--;
+		}
+	}
+
+	private boolean expired(int itemIndex) {
+		return items[itemIndex].sellIn < 0;
+	}
+
+	private void age(int itemIndex) {
+		items[itemIndex].sellIn = items[itemIndex].sellIn - 1;
+	}
+
 }
